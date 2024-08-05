@@ -19,27 +19,42 @@ jobs:
         env:
           yamlfile: .github/labeler.yml
         run: |
-          find integrations -mindepth 1 -maxdepth 1 -type d | grep -v '/\.' | awk -F'/' '{print $NF}' | jq -R -s -c 'split("\n")[:-1]' > integrations.json
-          echo "Integrations:"
-          cat integrations.json
-          touch ${{ env.yamlfile }}
-          echo "Add dynamic integration labels to ${{ env.yamlfile }}"
-          jq -r '.[]' integrations.json | while read integration; do
-            label="${integration//\//-}"
-            if [ "${#label}" -gt 63 ]; then
+          # Function to find folders, convert to JSON, and append labels to YAML file
+          process_folders() {
+            local path=$1
+
+            find "$path" -mindepth 1 -maxdepth 1 -type d | grep -v '/\.' | awk -F'/' '{print $NF}' | jq -R -s -c 'split("\n")[:-1]' > folders.json
+            echo "$path Folders:"
+            cat "$json_file"
+
+            jq -r '.[]' folders.json | while read -r folder; do
+              label="${folder//\//-}"
+              if [ "${#label}" -gt 63 ]; then
                 echo "Label is longer than 63 characters: $label"
                 label="${label:0:63}"
                 echo "Trimmed label to 63 characters: $label"
-            fi
-            echo "- $integration -> $label"
-            cat >> ${{ env.yamlfile }} << EOF
+              fi
+              echo "- $folder -> $label"
+              cat >> "${{ env.yamlfile }}" <<EOF
           $label:
             - changed-files:
-              - any-glob-to-any-file: 'integrations/$integration/**'
+              - any-glob-to-any-file: '$path/$folder/**'
           EOF
-          done
-          echo "Output file"
-          cat ${{ env.yamlfile }}
+            done
+          }
+
+          # Ensure the YAML file exists
+          touch "${{ env.yamlfile }}"
+          echo "Add dynamic integration labels to ${ env.yamlfile }}"
+
+          # Process root, project_2, and project_3 folders
+          process_folders "."
+          process_folders "project_2"
+          process_folders "project_3"
+
+          # Display the final output file
+          echo "Output file:"
+          cat "${{ env.yamlfile }}"
 
       - name: Apply labels
         uses: actions/labeler@v5
