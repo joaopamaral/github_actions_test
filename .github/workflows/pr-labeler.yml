@@ -27,6 +27,7 @@ jobs:
             find "$path" -mindepth 1 -maxdepth 1 -type d | jq -R -s -c 'split("\n")[:-1]'  > folders.json
 
             jq -r '.[]' folders.json | while read -r folder; do
+              folder="${folder#./}"  # Remove leading './' if present
               label="${folder//\//-}"
               if [ "${#label}" -gt 63 ]; then
                 echo "Label is longer than 63 characters: $label"
