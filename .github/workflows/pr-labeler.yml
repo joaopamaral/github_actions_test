@@ -35,7 +35,7 @@ jobs:
                 echo "Trimmed label to 63 characters: $label"
               fi
               cat >> "${{ env.yamlfile }}" <<EOF
-          ${prefix}-${label}:
+          ${prefix}${label}:
             - changed-files:
               - any-glob-to-any-file: '$path/$folder/**'
           EOF
@@ -48,8 +48,8 @@ jobs:
 
           # Process root, project_2, and project_3 folders
           process_folders "." ""
-          process_folders "project_2" "project_2"
-          process_folders "project_3" ""project_3""
+          process_folders "project_2" "project_2-"
+          process_folders "project_3" "project_3-"
 
           # Display the final output file
           echo "Output file:"
