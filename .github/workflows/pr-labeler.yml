@@ -37,7 +37,7 @@ jobs:
               fi
               echo "- $folder -> $label"
               cat >> "${{ env.yamlfile }}" <<EOF
-              $prefix-$label:
+              ${prefix}-${label}:
                 - changed-files:
                   - any-glob-to-any-file: '$path/$folder/**'
               EOF
