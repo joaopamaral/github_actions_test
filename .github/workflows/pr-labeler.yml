@@ -24,18 +24,18 @@ jobs:
           cat root_folders.json
           touch ${{ env.yamlfile }}
           echo "Add dynamic integration labels to ${{ env.yamlfile }}"
-          jq -r '.[]' integrations.json | while read integration; do
-            label="${integration//\//-}"
+          jq -r '.[]' root_folders.json | while read root_folder; do
+            label="${root_folder//\//-}"
             if [ "${#label}" -gt 63 ]; then
                 echo "Label is longer than 63 characters: $label"
                 label="${label:0:63}"
                 echo "Trimmed label to 63 characters: $label"
             fi
-            echo "- $integration -> $label"
+            echo "- $root_folder -> $label"
             cat >> ${{ env.yamlfile }} << EOF
           $label:
             - changed-files:
-              - any-glob-to-any-file: 'integrations/$integration/**'
+              - any-glob-to-any-file: '$root_folder/**'
           EOF
           done
           echo "Output file"
