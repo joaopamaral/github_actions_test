@@ -4,13 +4,14 @@
 # https://github.com/actions/labeler
 
 name: Labeler
-on:
-  workflow_dispatch:
-  pull_request_target:
+on: [pull_request_target]
 
 jobs:
   labeler:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
