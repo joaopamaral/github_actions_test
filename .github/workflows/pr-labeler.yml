@@ -25,7 +25,7 @@ jobs:
 
             find "$path" -mindepth 1 -maxdepth 1 -type d | grep -v '/\.' | awk -F'/' '{print $NF}' | jq -R -s -c 'split("\n")[:-1]' > folders.json
             echo "$path Folders:"
-            cat "$json_file"
+            cat folders.json
 
             jq -r '.[]' folders.json | while read -r folder; do
               label="${folder//\//-}"
