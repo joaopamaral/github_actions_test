@@ -45,7 +45,7 @@ jobs:
 
           # Ensure the YAML file exists
           touch "${{ env.yamlfile }}"
-          echo "Add dynamic integration labels to ${{} env.yamlfile }}"
+          echo "Add dynamic integration labels to ${{ env.yamlfile }}"
 
           # Process root, project_2, and project_3 folders
           process_folders "."
