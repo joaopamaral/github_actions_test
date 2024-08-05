@@ -23,9 +23,8 @@ jobs:
           # Function to find folders, convert to JSON, and append labels to YAML file
           process_folders() {
             local path=$1
-            local prefix=$2
 
-            find "$path" -mindepth 1 -maxdepth 1 -type d | grep -v '/\.' | awk -F'/' '{print $NF}' | jq -R -s -c 'split("\n")[:-1]' > folders.json
+            find "$path" -mindepth 1 -maxdepth 1 -type d | jq -R -s -c 'split("\n")[:-1]'  > folders.json
 
             jq -r '.[]' folders.json | while read -r folder; do
               label="${folder//\//-}"
@@ -35,9 +34,9 @@ jobs:
                 echo "Trimmed label to 63 characters: $label"
               fi
               cat >> "${{ env.yamlfile }}" <<EOF
-          ${prefix}${label}:
+          ${label}:
             - changed-files:
-              - any-glob-to-any-file: '$path/$folder/**'
+              - any-glob-to-any-file: '$folder/**'
           EOF
             done
           }
@@ -47,9 +46,9 @@ jobs:
           echo "Add dynamic integration labels to ${{ env.yamlfile }}"
 
           # Process root, project_2, and project_3 folders
-          process_folders "." ""
-          process_folders "project_2" "project_2-"
-          process_folders "project_3" "project_3-"
+          process_folders "."
+          process_folders "project_2"
+          process_folders "project_3"
 
           # Display the final output file
           echo "Output file:"
